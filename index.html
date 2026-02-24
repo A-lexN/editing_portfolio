@@ -1,0 +1,2678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AL_E_XN · video editor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@900&family=JetBrains+Mono:wght@100;200;300;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F5C842;
+            --text-color: #000;
+            --white: #ffffff;
+            --dark: #111111;
+            --border-width: 2px;
+            --border-pad: 10px;
+            --section-margin: 10px; 
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            overflow-x: hidden; 
+            width: 100%;
+            position: relative;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 200;
+            min-height: 100vh;
+            padding: 24px;
+            color: var(--dark);
+        }
+
+        .site-container {
+            max-width: 1280px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 0.95;
+        }
+
+        img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        /* ===== PIXEL REVEAL ANIMATION ===== */
+        .pixel-reveal {
+            opacity: 0;
+            transition: none;
+            position: relative;
+        }
+
+        .pixel-reveal.animating {
+            animation: none;
+            opacity: 1;
+        }
+
+        .pixel-reveal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            border-radius: inherit;
+        }
+
+        /* TERMINAL CODE DECORATIONS */
+        .terminal-decoration {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 100;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.45);
+            line-height: 1.6;
+            white-space: pre;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .deco-retro {
+            position: absolute;
+            pointer-events: none;
+            user-select: none;
+            z-index: 0;
+        }
+
+        .deco-retro .terminal-block {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 100;
+            font-size: 0.6rem;
+            line-height: 1.5;
+            color: rgba(0,0,0,0.1);
+            white-space: pre;
+        }
+
+        /* Math Elements */
+        .math-deco {
+            position: absolute;
+            pointer-events: none;
+            user-select: none;
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        /* ============= HERO SECTION ============= */
+        .hero {
+            border: var(--border-width) solid var(--white);
+            border-radius: 36px;
+            padding: 14px; 
+            margin: 10px;
+            margin-bottom: var(--section-margin);
+            position: relative;
+            background: transparent;
+        }
+
+        .hero-inner {
+            background: linear-gradient(0deg, rgba(0,0,0,0.5), rgba(0,0,0,0.5));
+            background-size: cover;
+            border-radius: 24px;
+            padding: 60px 50px 80px 50px;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            aspect-ratio: 16/9;
+        }
+
+        .hero-video-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            opacity: 0.6;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(0deg, rgba(0,0,0,0.45), rgba(0,0,0,0.3));
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 7vw, 5rem);
+            color: var(--white);
+            margin-bottom: 20px;
+            line-height: 0.9;
+        }
+
+        .hero p {
+            color: var(--white);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 200;
+            font-size: 1rem;
+            margin-bottom: 30px;
+            max-width: 500px;
+            opacity: 0.9;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px; 
+            flex-wrap: wrap;
+            padding: 0; 
+            margin-left: -5px; 
+        }
+
+        .hero-btn {
+            background: var(--bg-color); 
+            border-radius: 12px;
+            padding: 12px 60px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: transform 0.2s ease, opacity 0.2s;
+            border: none;
+            outline: none;
+        }
+
+        .hero-btn:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+
+        .hero-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--white); 
+        }
+
+        .hero-video-element {
+            position: relative;
+            z-index: 2;
+            flex: 0 0 280px;
+            width: 280px;
+            height: 280px;
+        }
+
+        .video-square-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .video-square-wrapper video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .video-svg-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .video-svg-bg svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ============= CLIENTS SECTION ============= */
+        .clients-section {
+            border: none; 
+            border-radius: 36px;
+            margin: 10px;
+            margin-bottom: var(--section-margin);
+            padding: 50px 30px 60px;
+            position: relative;
+            overflow: hidden; 
+        }
+
+        .clients-section h2 {
+            font-size: 3rem;
+            color: var(--white);
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .clients-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px; 
+            max-width: 100%; 
+            margin: 0 auto;
+            position: relative;
+            min-height: auto; 
+            padding-bottom: 20px;
+            width: 100%;
+        }
+
+        .client-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s ease;
+            position: relative;
+            width: 100%; 
+        }
+
+        .client-card:hover {
+            z-index: 10;
+            transform: scale(1.05) rotate(0deg) !important;
+        }
+
+        .client-frame {
+            border: var(--border-width) solid var(--white);
+            border-radius: 20px;
+            padding: var(--border-pad);
+            background: transparent; 
+            position: relative;
+            width: 100%;
+            max-width: 200px; 
+            display: flex;
+            flex-direction: column;
+            gap: 10px; 
+        }
+
+        .client-card.pos-1 { transform: rotate(-3deg); justify-self: center; }
+        .client-card.pos-2 { transform: rotate(2deg); justify-self: center; }
+        .client-card.pos-3 { transform: rotate(3deg); justify-self: center; }
+        .client-card.pos-4 { transform: rotate(-2deg); justify-self: center; }
+        .client-card.pos-5 { transform: rotate(1deg); justify-self: center; }
+        .client-card.pos-6 { transform: rotate(-3deg); justify-self: center; }
+
+        .client-img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            border-radius: 14px;
+            object-fit: cover;
+            background: #333;
+        }
+
+        .client-stats {
+            position: relative;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 400;
+            font-size: 0.9rem;
+            color: var(--dark);
+            text-align: center;
+            padding: 5px 0 0 0;
+        }
+
+        /* ============= WORKS SECTION ============= */
+        .works-section {
+            margin: 10px;
+            margin-bottom: var(--section-margin);
+            border: none;
+            border-radius: 36px;
+            padding: 50px 30px 60px;
+            position: relative;
+        }
+
+        .works-section > h2 {
+            font-size: 3rem;
+            color: var(--white);
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .work-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 60px;
+            gap: 30px;
+            max-width: 1050px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .work-item.left { flex-direction: row; }
+        .work-item.right { flex-direction: row-reverse; }
+
+        .work-card {
+            flex: 0 0 48%;
+            border: var(--border-width) solid var(--white);
+            border-radius: 20px;
+            padding: var(--border-pad);
+            background: transparent;
+            transition: transform 0.3s;
+        }
+
+        .work-card:hover { transform: scale(1.02) rotate(0deg) !important; }
+
+        .work-img {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #222;
+            border-radius: 14px;
+            object-fit: cover;
+            border: none;
+        }
+
+        .work-caption {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 200;
+            font-size: 0.75rem;
+            color: var(--dark);
+            margin-top: 10px;
+            padding: 0 5px;
+            line-height: 1.3;
+        }
+        
+        .poster-caption a {
+            color: inherit;
+            text-decoration: underline;
+            font-weight: 400;
+        }
+
+        .work-quote {
+            flex: 1;
+            position: relative;
+            padding: 10px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: visible; 
+        }
+
+        .quote-mark {
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 900;
+            font-size: 12rem; 
+            line-height: 0; 
+            color: var(--white);
+            opacity: 0.6;
+            display: block;
+            height: 0; 
+        }
+        
+        .quote-mark svg { display: none; }
+
+        .quote-mark.open { 
+            text-align: left; 
+            margin-top: 0; 
+            margin-bottom: 0;
+            transform: translateY(15px); 
+        }
+        
+        .quote-mark.close { 
+            text-align: right; 
+            margin-top: 0;
+            transform: translateY(50px); 
+        }
+
+        .quote-mark.open::before { content: '“'; display: block; }
+        .quote-mark.close::after { content: '”'; display: block; }
+
+        .quote-text {
+            color: var(--white);
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 900;
+            font-size: 2.2rem;
+            line-height: 1.1;
+            padding: 40px 0;
+            position: relative;
+            z-index: 2;
+            text-transform: uppercase;
+        }
+
+        .work-item.left .work-quote { text-align: right; }
+        .work-item.left .quote-text { text-align: right; }
+        
+        .work-item.right .work-quote { text-align: left; }
+        .work-item.right .quote-text { text-align: left; }
+
+        /* SHOWREEL */
+        .showreel-wrapper {
+            display: flex;
+            justify-content: center;
+            margin: 60px 0;
+        }
+
+        .showreel-card {
+            width: 55%;
+            border: var(--border-width) solid var(--white);
+            border-radius: 20px;
+            padding: var(--border-pad);
+            background: rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        
+        .showreel-card:hover { transform: scale(1.02); }
+
+        .showreel-img-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .showreel-img-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            fill: white;
+            z-index: 2;
+        }
+
+        .poster-card {
+            flex: 0 0 40%;
+            border: var(--border-width) solid var(--white);
+            border-radius: 20px;
+            padding: var(--border-pad);
+            background: transparent;
+            transition: transform 0.3s;
+        }
+        
+        .poster-card:hover { transform: scale(1.02) rotate(0deg) !important; }
+
+        .poster-img {
+            width: 100%;
+            aspect-ratio: 1270/1970;
+            background: linear-gradient(180deg, #333 0%, #111 100%);
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            text-align: center;
+            object-fit: cover;
+        }
+
+        .poster-caption {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 200;
+            font-size: 0.7rem;
+            color: var(--dark);
+            margin-top: 10px;
+            padding: 0 5px;
+            line-height: 1.3;
+        }
+
+        /* ============= CONTACT / CTA SECTION ============= */
+        .cta-section {
+            text-align: center;
+            padding: 60px 20px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .cta-section h2 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            color: var(--white);
+            line-height: 1.1;
+            margin-bottom: 40px;
+        }
+
+        .cta-video-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .cta-video-element {
+            position: relative;
+            width: 280px;
+            height: 280px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .cta-btn {
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 900;
+            font-size: 1rem;
+            padding: 12px 40px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.25);
+            color: var(--white);
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            outline: none;
+        }
+
+        .cta-btn:hover {
+            transform: scale(1.05);
+            background: rgba(255,255,255,0.4);
+        }
+
+        .cta-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--white);
+        }
+
+        /* ============= GAMES SECTION ============= */
+        .games-section {
+            border: var(--border-width) solid var(--white);
+            border-radius: 36px;
+            padding: calc(40px + var(--border-pad)) calc(30px + var(--border-pad));
+            margin: 10px;
+            margin-bottom: var(--section-margin);
+            text-align: center;
+            position: relative;
+        }
+
+        .games-section h2 {
+            font-size: 2rem;
+            color: var(--white);
+            margin-bottom: 10px;
+        }
+
+        .game-score {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 200;
+            color: var(--white);
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .game-hint {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 200;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.8rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .game-hint .key-group {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .game-hint .key {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border: 1px solid rgba(255,255,255,0.35);
+            border-radius: 6px;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.6);
+            background: rgba(255,255,255,0.08);
+        }
+
+        .game-hint .key.wide {
+            width: auto;
+            padding: 0 10px;
+        }
+
+        .game-hint span.or-text {
+            color: rgba(255,255,255,0.3);
+            font-size: 0.65rem;
+        }
+
+        .game-slider-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px; 
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .game-tab {
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 900;
+            font-size: 0.85rem;
+            padding: 8px 24px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.25);
+            color: var(--white);
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+            user-select: none;
+            border: none !important;
+            outline: none !important;
+        }
+
+        .game-tab:hover {
+            background: rgba(255,255,255,0.4);
+            transform: scale(1.05);
+        }
+
+        .game-tab.active {
+            background: rgba(255,255,255,0.55);
+            transform: scale(1.05);
+            color: #000;
+        }
+
+        .game-canvas-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            padding: 10px; 
+        }
+
+        .game-canvas {
+            border-radius: 14px;
+            background: rgba(0,0,0,0.15);
+            max-width: 100%;
+            touch-action: none;
+            border: 2px solid rgba(255,255,255,0.2) !important;
+            outline: none !important;
+        }
+
+        .game-panel {
+            display: none;
+        }
+        .game-panel.active {
+            display: block;
+        }
+
+        /* --- UPDATED GAME CONTROLS STYLES --- */
+        .game-controls {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            gap: 15px; 
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .game-ctrl-btn {
+            width: 65px; 
+            height: 65px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            color: var(--white);
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.3) !important;
+            outline: none !important;
+            transition: background 0.1s;
+            
+            /* Disable selection and callouts (Search in Google fix) */
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -webkit-touch-callout: none;
+            touch-action: none; 
+        }
+
+        .game-ctrl-btn:active {
+            background: rgba(255,255,255,0.4);
+            transform: scale(0.95);
+        }
+
+        /* Snake D-Pad Grid */
+        .game-controls-grid {
+            display: grid;
+            grid-template-columns: 70px 70px 70px;
+            grid-template-rows: 70px 70px;
+            gap: 5px;
+            justify-content: center;
+            justify-items: center;
+            align-items: center;
+        }
+
+        .game-start-btn {
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 900;
+            font-size: 1rem;
+            padding: 12px 40px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.25);
+            color: var(--white);
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 15px;
+            border: none !important;
+            outline: none !important;
+        }
+
+        .game-start-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+
+        /* ============= FOOTER ============= */
+        .footer {
+            padding-top: 20px;
+            position: relative;
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 0 10px;
+        }
+
+        .fb-left {
+            text-align: left;
+        }
+
+        .fb-left h3 {
+            font-size: 3.5rem;
+            color: var(--white);
+            line-height: 1;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        .fb-left .email {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 200;
+            font-size: 0.9rem;
+            color: var(--white);
+            text-decoration: none;
+            margin-top: 5px;
+            display: block;
+            opacity: 0.8;
+        }
+
+        .social-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--white);
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 900;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .social-link:hover { opacity: 0.7; }
+
+        .social-link span {
+            text-decoration: underline;
+        }
+
+        .social-link svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .credit {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 200;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.5);
+            margin-top: 15px;
+            text-align: right;
+        }
+
+        .credit a {
+            color: rgba(255,255,255,0.5);
+            text-decoration: underline;
+        }
+
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            animation: scanMove 4s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes scanMove {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        .coord-label {
+            position: absolute;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 100;
+            font-size: 0.55rem;
+            color: rgba(255,255,255,0.25);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .blink-cursor::after {
+            content: '█';
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .deco-separator {
+            width: 100%;
+            padding: 10px 0; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .deco-separator-inner {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            opacity: 0.12;
+        }
+
+        .deco-separator-inner svg {
+            flex-shrink: 0;
+        }
+
+        .deco-separator-inner .sep-line {
+            width: 120px;
+            height: 1px;
+            background: var(--dark);
+        }
+
+        .deco-separator-inner .sep-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 100;
+            font-size: 0.55rem;
+            color: var(--dark);
+            white-space: nowrap;
+        }
+
+        /* ============= RESPONSIVE ============= */
+        @media (max-width: 1100px) {
+            .clients-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 30px;
+            }
+            .work-item {
+                flex-direction: column !important;
+                gap: 20px;
+            }
+            .work-card, .poster-card, .showreel-card {
+                flex: none;
+                width: 100%;
+                padding: 5px; 
+                /* FIX: Reset rotation on tablets/phones to prevent disappearance/overflow */
+                transform: rotate(0deg) !important;
+            }
+            .work-quote { text-align: center !important; }
+            .work-item.left .quote-mark.open,
+            .work-item.right .quote-mark.open { 
+                text-align: center; 
+                justify-content: center; 
+                display: block; 
+                margin: 0; 
+                transform: translateY(10px);
+            }
+            .work-item.left .quote-mark.close,
+            .work-item.right .quote-mark.close { 
+                text-align: center; 
+                justify-content: center; 
+                display: block; 
+                margin: 0; 
+                transform: translateY(10px); 
+            }
+        }
+
+        @media (max-width: 900px) {
+            .site-container { padding: 10px; }
+            .hero-inner {
+                padding: 30px 20px 50px;
+                flex-direction: column;
+                gap: 30px;
+                aspect-ratio: auto;
+            }
+            .hero { margin: 5px; margin-bottom: var(--section-margin); }
+            .hero-video-element {
+                flex: none;
+                width: 200px;
+                height: 200px;
+            }
+            .hero-btn {
+                padding: 12px 30px;
+            }
+            .client-card.pos-1,
+            .client-card.pos-2,
+            .client-card.pos-3,
+            .client-card.pos-4,
+            .client-card.pos-5,
+            .client-card.pos-6 {
+                margin: 0;
+                justify-self: center;
+            }
+            .quote-text { 
+                padding: 20px 0; 
+                text-align: center;
+            }
+            .quote-mark { font-size: 8rem; } 
+            
+            .footer-bottom {
+                flex-direction: column;
+                align-items: center;
+                gap: 30px;
+                text-align: center;
+            }
+            .fb-left { text-align: center; }
+            .social-links { justify-content: center; }
+            .credit { text-align: center; }
+            .game-controls { display: flex; }
+            .game-hint { display: none; }
+            .terminal-decoration { font-size: 0.55rem; }
+            .hero-buttons { justify-content: center; margin-left: 0; }
+            .cta-buttons { flex-wrap: wrap; }
+            .deco-retro { display: none; }
+            .clients-section, .works-section, .games-section { margin: 5px; margin-bottom: var(--section-margin); }
+        }
+
+        @media (max-width: 600px) {
+            .clients-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px; 
+            }
+            .hero h1 { font-size: 2rem; }
+            .fb-left h3 { font-size: 2.5rem; }
+            .quote-text { font-size: 1.5rem; }
+            .quote-mark { font-size: 6rem; }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .game-controls { display: flex; }
+            .game-hint { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="site-container">
+
+    <!-- ====== DECO: Top-left terminal block ====== -->
+    <div class="deco-retro" style="top: -5px; left: 30px;">
+        <div class="terminal-block">/// sys.init()
+/// loading modules...
+/// render_pipeline: active
+/// codec: h264 | prores
+/// fps: 24 | 30 | 60</div>
+    </div>
+
+    <!-- ====== DECO: Top-right grid SVG ====== -->
+    <div class="deco-retro" style="top: 5px; right: 30px;">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <line x1="0" y1="20" x2="80" y2="20" stroke="#000" stroke-width="0.3" opacity="0.08"/>
+            <line x1="0" y1="40" x2="80" y2="40" stroke="#000" stroke-width="0.3" opacity="0.08"/>
+            <line x1="0" y1="60" x2="80" y2="60" stroke="#000" stroke-width="0.3" opacity="0.08"/>
+            <line x1="20" y1="0" x2="20" y2="80" stroke="#000" stroke-width="0.3" opacity="0.08"/>
+            <line x1="40" y1="0" x2="40" y2="80" stroke="#000" stroke-width="0.3" opacity="0.08"/>
+            <line x1="60" y1="0" x2="60" y2="80" stroke="#000" stroke-width="0.3" opacity="0.08"/>
+            <circle cx="40" cy="40" r="3" fill="#000" opacity="0.06"/>
+            <circle cx="20" cy="20" r="1.5" fill="#000" opacity="0.06"/>
+            <circle cx="60" cy="60" r="1.5" fill="#000" opacity="0.06"/>
+        </svg>
+    </div>
+
+    <!-- =================== HERO =================== -->
+    <div class="hero pixel-reveal" id="heroSection">
+        <div class="hero-inner">
+            <video class="hero-video-bg" autoplay muted loop playsinline>
+                <source src="stuff/heroVid.mp4" type="video/mp4">
+            </video>
+            <div class="hero-overlay"></div>
+            <div class="scan-line"></div>
+
+            <div class="terminal-decoration" style="position:absolute;bottom:18px;left:25px;z-index:3;color:rgba(255,255,255,0.15);font-size:0.55rem;">
+///In short,
+///let's work together
+///and everything will be fine
+///with your content.
+            </div>
+
+            <!-- Math elements inside hero -->
+            <div style="position:absolute;top:20px;right:20px;z-index:3;pointer-events:none;user-select:none;opacity:0.3;">
+                <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+                    <line x1="30" y1="0" x2="30" y2="60" stroke="white" stroke-dasharray="2 2"/>
+                    <line x1="0" y1="30" x2="60" y2="30" stroke="white" stroke-dasharray="2 2"/>
+                    <circle cx="30" cy="30" r="15" stroke="white" stroke-width="0.5"/>
+                </svg>
+            </div>
+
+            <div class="hero-content">
+                <h1>AL_E_XN<br>VIDE0 EDIT0R</h1>
+                <p>I create st0ries that y0ur audience needs</p>
+                <div class="hero-buttons">
+                    <a href="https://x.com/Al_e_xN" class="hero-btn" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    </a>
+                    <a href="https://t.me/al_e_xn" class="hero-btn" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" fill="white"><path d="M20.665 3.717l-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42l10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001l-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15l4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.284-1.434z"/></svg>
+                    </a>
+                </div>
+            </div>
+
+            <div class="hero-video-element">
+                <div class="video-square-wrapper">
+                    <video autoplay muted loop playsinline>
+                        <source src="stuff/effectsDog.mp4" type="video/mp4">
+                    </video>
+                    <div class="video-svg-bg">
+                        <svg viewBox="0 0 280 280" fill="none">
+                            <rect width="280" height="280" rx="20" fill="rgba(255,255,255,0.1)"/>
+                            <rect x="20" y="20" width="240" height="240" rx="12" stroke="rgba(255,255,255,0.15)" stroke-width="1" fill="none"/>
+                            <line x1="140" y1="20" x2="140" y2="260" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                            <line x1="20" y1="140" x2="260" y2="140" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <span class="coord-label" style="top:15px;left:20px;">x:0 y:0</span>
+            <span class="coord-label" style="top:15px;right:20px;">x:1920 y:0</span>
+            <span class="coord-label" style="bottom:15px;left:20px;">x:0 y:1080</span>
+        </div>
+    </div>
+
+    <!-- ====== DECO SEPARATOR 1 ====== -->
+    <div class="deco-separator">
+        <div class="deco-separator-inner">
+            <div class="sep-line"></div>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <rect x="2" y="2" width="12" height="12" stroke="#000" stroke-width="1" fill="none"/>
+                <rect x="5" y="5" width="6" height="6" fill="#000" opacity="0.3"/>
+            </svg>
+            <div class="sep-text">// section::clients</div>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle cx="8" cy="8" r="6" stroke="#000" stroke-width="1" fill="none"/>
+                <circle cx="8" cy="8" r="2" fill="#000" opacity="0.3"/>
+            </svg>
+            <div class="sep-line"></div>
+        </div>
+    </div>
+
+    <div class="deco-retro" style="position:relative; margin-bottom: -15px; margin-left: 10px;">
+        <div class="terminal-block">/// data.fetch("clients")
+/// sorting: by_subscribers DESC
+/// status: ■■■■■■■■░░ 80%</div>
+    </div>
+
+    <!-- =================== CLIENTS =================== -->
+    <div class="clients-section pixel-reveal" id="clientsSection">
+        <h2>CLIENTS</h2>
+
+        <div class="clients-grid">
+            <!-- Client 1 -->
+            <div class="client-card pos-1">
+                <a href="https://www.youtube.com/@zaraznow" target="_blank">
+                    <div class="client-frame">
+                        <img src="stuff/1Av.jpg" alt="Client 1" class="client-img">
+                        <div class="client-stats">1.85M subscribers</div>
+                    </div>
+                </a>
+            </div>
+            <!-- Client 2 -->
+            <div class="client-card pos-2">
+                <a href="https://www.youtube.com/@VilyamBruno" target="_blank">
+                    <div class="client-frame">
+                        <img src="stuff/2Av.jpg" alt="Client 2" class="client-img">
+                        <div class="client-stats">20.8M subscribers</div>
+                    </div>
+                </a>
+            </div>
+            <!-- Client 3 -->
+            <div class="client-card pos-3">
+                <a href="https://www.youtube.com/@MysteryForce" target="_blank">
+                    <div class="client-frame">
+                        <img src="stuff/3Av.jpg" alt="Client 3" class="client-img">
+                        <div class="client-stats">2.09M subscribers</div>
+                    </div>
+                </a>
+            </div>
+            <!-- Client 4 -->
+            <div class="client-card pos-4">
+                <a href="https://www.youtube.com/@paradeevich" target="_blank">
+                    <div class="client-frame">
+                        <img src="stuff/4Av.jpg" alt="Client 4" class="client-img">
+                        <div class="client-stats">2.39M subscribers</div>
+                    </div>
+                </a>     
+            </div>
+            <!-- Client 5 -->
+            <div class="client-card pos-5">
+                <div class="client-frame">
+                    <a href="https://www.youtube.com/@nevaaada" target="_blank">
+                        <img src="stuff/5Av.jpg" alt="Client 5" class="client-img">
+                        <div class="client-stats">8.12M subscribers</div>
+                    </a>
+                </div>
+            </div>
+            <!-- Client 6 -->
+            <div class="client-card pos-6">
+                <div class="client-frame">
+                    <a href="https://www.youtube.com/@Moonamoona" target="_blank">
+                        <img src="stuff/6Av.jpg" alt="Client 6" class="client-img">
+                        <div class="client-stats">1.3M subscribers</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====== DECO SEPARATOR 2 ====== -->
+    <div class="deco-separator">
+        <div class="deco-separator-inner">
+            <div class="sep-line"></div>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <polygon points="10,1 19,10 10,19 1,10" stroke="#000" stroke-width="0.8" fill="none"/>
+                <polygon points="10,5 15,10 10,15 5,10" fill="#000" opacity="0.15"/>
+            </svg>
+            <div class="sep-text">// loading::portfolio</div>
+            <svg width="30" height="12" viewBox="0 0 30 12" fill="none">
+                <rect x="0" y="0" width="4" height="12" fill="#000" opacity="0.2"/>
+                <rect x="6" y="3" width="4" height="9" fill="#000" opacity="0.15"/>
+                <rect x="12" y="1" width="4" height="11" fill="#000" opacity="0.25"/>
+                <rect x="18" y="4" width="4" height="8" fill="#000" opacity="0.12"/>
+                <rect x="24" y="2" width="4" height="10" fill="#000" opacity="0.18"/>
+            </svg>
+            <div class="sep-line"></div>
+        </div>
+    </div>
+
+    <!-- =================== WORKS =================== -->
+    <div class="works-section pixel-reveal" id="worksSection">
+        <div class="math-deco" style="top: 0; right: 0; height: 100%; width: 20px;">
+            <svg width="20" height="100%">
+                <pattern id="ruler" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <line x1="0" y1="20" x2="10" y2="20" stroke="#fff" stroke-width="1"/>
+                </pattern>
+                <rect width="20" height="100%" fill="url(#ruler)"/>
+            </svg>
+        </div>
+
+        <h2>MY WORKS</h2>
+
+        <!-- Work 1 -->
+        <div class="work-item left">
+            <div class="work-card" style="transform:rotate(-2deg);">
+                <iframe class="work-img" src="https://www.youtube.com/embed/ByeUJysGsmU?rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <div class="work-caption">I and my friends made a video about hide and seek.</div>
+            </div>
+            <div class="work-quote">
+                <span class="quote-mark open"></span>
+                <div class="quote-text">All is well! I'm loading a video.</div>
+                <span class="quote-mark close"></span>
+            </div>
+        </div>
+
+        <!-- Work 2 -->
+        <div class="work-item right">
+            <div class="work-card" style="transform:rotate(1.5deg);">
+                 <iframe class="work-img" src="https://www.youtube.com/embed/aCKnjn6tRGc?rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <div class="work-caption">Made a true crime video in a very short time.</div>
+            </div>
+            <div class="work-quote">
+                <span class="quote-mark open"></span>
+                <div class="quote-text">I like it.<br>The atmosphere is very well created. It's a real page-turner!</div>
+                <span class="quote-mark close"></span>
+            </div>
+        </div>
+
+        <!-- Showreel -->
+        <div class="showreel-wrapper">
+            <div class="showreel-card">
+                <div class="showreel-img-container">
+                    <iframe src="https://www.youtube.com/embed/1RH4pFp9NIg?rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+                <div class="work-caption" style="text-align:center;">My video editing showreel from 2024.</div>
+            </div>
+        </div>
+
+        <!-- Work 3 -->
+        <div class="work-item left">
+            <div class="work-card" style="transform:rotate(-1deg);">
+                <iframe class="work-img" src="https://www.youtube.com/embed/gngJgZp3XCM?rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <div class="work-caption">I and my friends made a IRL video about hotels.</div>
+            </div>
+            <div class="work-quote">
+                <span class="quote-mark open"></span>
+                <div class="quote-text">Cool editing</div>
+                <span class="quote-mark close"></span>
+            </div>
+        </div>
+
+        <!-- Work 4 -->
+        <div class="work-item right">
+            <div class="work-card" style="transform:rotate(2deg);">
+                <iframe class="work-img" src="https://www.youtube.com/embed/rDtSHKJsqfM?rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <div class="work-caption">A promo video for a productivity app.</div>
+            </div>
+            <div class="work-quote">
+                <span class="quote-mark open"></span>
+                <div class="quote-text">Awesome! Thank you so much! That’s really cool, it gives me goosebumps.</div>
+                <span class="quote-mark close"></span>
+            </div>
+        </div>
+
+        <!-- Video 5 (Poster/Short Film) -->
+        <div class="work-item left" style="justify-content:center;">
+            <div class="poster-card" style="transform:rotate(-1.5deg);flex:0 0 24%;">
+                <a href="https://youtu.be/aCKnjn6tRGc?si=cXwcDFOVEdWm40r2" target="_blank">
+                    <img src="stuff/6Pr.png" alt="Poster" class="poster-img" style="background:linear-gradient(180deg,#333 0%,#111 100%);">
+                </a>
+                <div class="poster-caption">
+                    Edited and was assistant cameraman in the short film <a href="https://www.imdb.com/title/tt36775570/" target="_blank">"Love in the Fitting Room"</a>.
+                    <br><br>
+                    Participates in festivals <a href="https://filmfreeway.com/First-TimeFilmmakerSessions" target="_blank">FTSFV (vimeo on demand),</a> <a href="https://www.instagram.com/p/DDXZVPnRdIw/" target="_blank">Pinewood Studios in London</a>
+                </div>
+            </div>
+            <div class="work-quote">
+                <span class="quote-mark open"></span>
+                <div class="quote-text">You're the best!<br>Everything is great,<br>be sure to come to the cinema to see what we've done. Wait for a surprise from me.</div>
+                <span class="quote-mark close"></span>
+            </div>
+        </div>
+
+        <div class="terminal-decoration" style="position:absolute;bottom:15px;right:20px;color:rgba(255,255,255,0.1);">
+// export.complete()
+// total_renders: 847
+// avg_time: 4m 22s
+        </div>
+    </div>
+
+    <!-- ====== DECO SEPARATOR 3 ====== -->
+    <div class="deco-separator">
+        <div class="deco-separator-inner">
+            <div class="sep-line"></div>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L2 12L12 22L22 12Z" stroke="#000" stroke-width="0.6" fill="none"/>
+                <path d="M12 6L6 12L12 18L18 12Z" stroke="#000" stroke-width="0.4" fill="none"/>
+                <circle cx="12" cy="12" r="2" fill="#000" opacity="0.15"/>
+            </svg>
+            <div class="sep-text">// break; play_game()</div>
+            <svg width="40" height="12" viewBox="0 0 40 12" fill="none">
+                <rect x="0" y="5" width="40" height="2" fill="#000" opacity="0.1"/>
+                <circle cx="5" cy="6" r="3" stroke="#000" stroke-width="0.5" fill="none" opacity="0.15"/>
+                <circle cx="20" cy="6" r="3" stroke="#000" stroke-width="0.5" fill="none" opacity="0.15"/>
+                <circle cx="35" cy="6" r="3" stroke="#000" stroke-width="0.5" fill="none" opacity="0.15"/>
+            </svg>
+            <div class="sep-line"></div>
+        </div>
+    </div>
+
+    <!-- =================== GAMES SECTION =================== -->
+    <div class="games-section pixel-reveal" id="gamesSection">
+        <h2 id="gameTitle">BORED? PLAY SNAKE</h2>
+        <div class="game-score" id="gameScoreRow">SCORE: <span id="gameScore">0</span> | BEST: <span id="gameBest">0</span></div>
+
+        <!-- GAME SLIDER TABS -->
+        <div class="game-slider-tabs">
+            <div class="game-tab active" data-game="snake" onclick="switchGame('snake')">🐍 SNAKE</div>
+            <div class="game-tab" data-game="pong" onclick="switchGame('pong')">🏓 PONG</div>
+            <div class="game-tab" data-game="flappy" onclick="switchGame('flappy')">🐦 FLAPPY</div>
+            <div class="game-tab" data-game="arkanoid" onclick="switchGame('arkanoid')">🧱 ARKANOID</div>
+        </div>
+
+        <!-- === SNAKE PANEL === -->
+        <div class="game-panel active" id="panel-snake">
+            <div class="game-hint" id="snakeHint">
+                <div class="key-group">
+                    <div class="key">↑</div>
+                    <div class="key">←</div>
+                    <div class="key">↓</div>
+                    <div class="key">→</div>
+                </div>
+                <span class="or-text">to move</span>
+            </div>
+            <div class="game-canvas-wrapper">
+                <canvas id="snakeCanvas" class="game-canvas" width="400" height="400"></canvas>
+            </div>
+            <button class="game-start-btn" id="snakeStartBtn" onclick="startSnake()">START GAME</button>
+            <div class="game-controls" id="snakeControls">
+                <div class="game-controls-grid">
+                    <div style="grid-column:2;grid-row:1;">
+                        <div class="game-ctrl-btn" oncontextmenu="return false;" ontouchstart="snakeDir('up')" onclick="snakeDir('up')">↑</div>
+                    </div>
+                    <div style="grid-column:1;grid-row:2;">
+                        <div class="game-ctrl-btn" oncontextmenu="return false;" ontouchstart="snakeDir('left')" onclick="snakeDir('left')">←</div>
+                    </div>
+                    <div style="grid-column:2;grid-row:2;">
+                        <div class="game-ctrl-btn" oncontextmenu="return false;" ontouchstart="snakeDir('down')" onclick="snakeDir('down')">↓</div>
+                    </div>
+                    <div style="grid-column:3;grid-row:2;">
+                        <div class="game-ctrl-btn" oncontextmenu="return false;" ontouchstart="snakeDir('right')" onclick="snakeDir('right')">→</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === PONG PANEL === -->
+        <div class="game-panel" id="panel-pong">
+            <div class="game-hint" id="pongHint">
+                <div class="key-group">
+                    <div class="key">↑</div>
+                    <div class="key">↓</div>
+                </div>
+                <span class="or-text">to move paddle</span>
+            </div>
+            <div class="game-canvas-wrapper">
+                <canvas id="pongCanvas" class="game-canvas" width="400" height="400"></canvas>
+            </div>
+            <button class="game-start-btn" id="pongStartBtn" onclick="startPong()">START GAME</button>
+            <div class="game-controls" id="pongControls">
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <div class="game-ctrl-btn" oncontextmenu="return false;" ontouchstart="pongInput(true, 'up')" ontouchend="pongInput(false, 'up')">↑</div>
+                    <div class="game-ctrl-btn" oncontextmenu="return false;" ontouchstart="pongInput(true, 'down')" ontouchend="pongInput(false, 'down')">↓</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === FLAPPY PANEL === -->
+        <div class="game-panel" id="panel-flappy">
+            <div class="game-hint" id="flappyHint">
+                <div class="key-group">
+                    <div class="key wide">SPACE</div>
+                </div>
+                <span class="or-text">or</span>
+                <div class="key-group">
+                    <div class="key">↑</div>
+                </div>
+                <span class="or-text">to flap</span>
+            </div>
+            <div class="game-canvas-wrapper">
+                <canvas id="flappyCanvas" class="game-canvas" width="400" height="400"></canvas>
+            </div>
+            <button class="game-start-btn" id="flappyStartBtn" onclick="startFlappy()">START GAME</button>
+            <div class="game-controls" id="flappyControls">
+                <div style="display:flex;justify-content:center;">
+                    <div class="game-ctrl-btn" style="width:80px;height:80px;border-radius:50%;" oncontextmenu="return false;" ontouchstart="flappyFlap()" onclick="flappyFlap()">↑</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === ARKANOID PANEL === -->
+        <div class="game-panel" id="panel-arkanoid">
+            <div class="game-hint" id="arkanoidHint">
+                <div class="key-group">
+                    <div class="key">←</div>
+                    <div class="key">→</div>
+                </div>
+                <span class="or-text">to move paddle</span>
+            </div>
+            <div class="game-canvas-wrapper">
+                <canvas id="arkanoidCanvas" class="game-canvas" width="400" height="400"></canvas>
+            </div>
+            <button class="game-start-btn" id="arkanoidStartBtn" onclick="startArkanoid()">START GAME</button>
+            <div class="game-controls" id="arkanoidControls">
+                <div style="display:flex;justify-content:center;gap:30px;">
+                    <div class="game-ctrl-btn" style="touch-action: none;"
+                         oncontextmenu="return false;"
+                         ontouchstart="setArkanoidInput(event, true, 'left')" 
+                         ontouchend="setArkanoidInput(event, false, 'left')"
+                         onmousedown="setArkanoidInput(event, true, 'left')" 
+                         onmouseup="setArkanoidInput(event, false, 'left')"
+                         onmouseleave="setArkanoidInput(event, false, 'left')">←</div>
+                    <div class="game-ctrl-btn" style="touch-action: none;"
+                         oncontextmenu="return false;"
+                         ontouchstart="setArkanoidInput(event, true, 'right')" 
+                         ontouchend="setArkanoidInput(event, false, 'right')"
+                         onmousedown="setArkanoidInput(event, true, 'right')" 
+                         onmouseup="setArkanoidInput(event, false, 'right')"
+                         onmouseleave="setArkanoidInput(event, false, 'right')">→</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Terminal decoration -->
+        <div class="terminal-decoration" style="position:absolute;bottom:10px;right:15px;color:rgba(255,255,255,0.2);">
+// arcade.js v3.0
+// games: snake | pong | flappy | arkanoid
+// status: ready
+        </div>
+    </div>
+
+    <!-- ====== DECO SEPARATOR 4 ====== -->
+    <div class="deco-separator">
+        <div class="deco-separator-inner">
+            <div class="sep-line"></div>
+            <svg width="50" viewBox="0 0 50 14" fill="none">
+                <rect x="0" y="0" width="8" height="14" rx="1" fill="#000" opacity="0.12"/>
+                <rect x="10" y="3" width="8" height="11" rx="1" fill="#000" opacity="0.08"/>
+                <rect x="20" y="1" width="8" height="13" rx="1" fill="#000" opacity="0.15"/>
+                <rect x="30" y="5" width="8" height="9" rx="1" fill="#000" opacity="0.1"/>
+                <rect x="40" y="2" width="8" height="12" rx="1" fill="#000" opacity="0.13"/>
+            </svg>
+            <div class="sep-text">// connect::init()</div>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <rect x="1" y="1" width="18" height="18" rx="3" stroke="#000" stroke-width="0.6" fill="none"/>
+                <path d="M5 10L9 14L15 6" stroke="#000" stroke-width="0.8" fill="none" opacity="0.2"/>
+            </svg>
+            <div class="sep-line"></div>
+        </div>
+    </div>
+
+    <!-- ====== DECO: Terminal block near CTA ====== -->
+    <div class="deco-retro" style="position:relative; margin-bottom:-10px; margin-left:15px;">
+        <div class="terminal-block">///In short,
+///let's work together
+///and everything will be fine
+///with your content.</div>
+    </div>
+
+    <!-- =================== CONTACT / CTA =================== -->
+    <div class="cta-section pixel-reveal" id="ctaSection">
+        <h2>CONTACT ME<br>AND LET'S WORK TOGETHER!</h2>
+
+        <div style="position:absolute;top:20px;right:20px;pointer-events:none;user-select:none;">
+            <svg width="70" height="70" viewBox="0 0 70 70" fill="none" opacity="0.06">
+                <circle cx="35" cy="35" r="30" stroke="#000" stroke-width="0.5" fill="none"/>
+                <circle cx="35" cy="35" r="20" stroke="#000" stroke-width="0.3" fill="none"/>
+                <circle cx="35" cy="35" r="10" stroke="#000" stroke-width="0.3" fill="none"/>
+                <line x1="35" y1="0" x2="35" y2="70" stroke="#000" stroke-width="0.3"/>
+                <line x1="0" y1="35" x2="70" y2="35" stroke="#000" stroke-width="0.3"/>
+            </svg>
+        </div>
+
+        <!-- Mascot / video element -->
+        <div class="cta-video-wrapper">
+            <div class="cta-video-element">
+                <div class="video-square-wrapper">
+                    <video autoplay muted loop playsinline>
+                        <source src="stuff/effectsDog.mp4" type="video/mp4">
+                    </video>
+                    <div class="video-svg-bg">
+                        <svg viewBox="0 0 280 280" fill="none">
+                            <rect width="280" height="280" rx="20" fill="rgba(255,255,255,0.08)"/>
+                            <g opacity="0.1">
+                                <rect x="10" y="10" width="50" height="30" rx="4" stroke="white" stroke-width="0.5" fill="none"/>
+                                <rect x="70" y="10" width="80" height="30" rx="4" stroke="white" stroke-width="0.5" fill="none"/>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA buttons -->
+        <div class="cta-buttons">
+            <a href="https://x.com/Al_e_xN" class="cta-btn" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                X.COM
+            </a>
+            <a href="https://t.me/al_e_xn" class="cta-btn" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="white"><path d="M20.665 3.717l-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42l10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001l-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15l4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.284-1.434z"/></svg>
+                TELEGRAM
+            </a>
+        </div>
+    </div>
+
+    <!-- ====== DECO: Pre-footer terminal ====== -->
+    <div class="deco-retro" style="position:relative; margin-bottom:5px; text-align:center;">
+        <div class="terminal-block" style="display:inline-block;text-align:left;">
+/// session.end()
+/// uptime: 03:47:22
+/// renders_today: 12
+/// status: awaiting_new_project <span class="blink-cursor"></span></div>
+    </div>
+
+    <!-- =================== FOOTER =================== -->
+    <footer class="footer">
+        <div class="footer-bottom">
+            <div class="fb-left">
+                <h3>AL_E_XN</h3>
+                <a href="mailto:alexn.editing@gmail.com" class="email">alexn.editing@gmail.com</a>
+            </div>
+            <div class="fb-right">
+                <div class="social-links">
+                    <a href="https://x.com/Al_e_xN" class="social-link" target="_blank" rel="noopener">
+                        <span>Twitter</span>
+                        <svg viewBox="0 0 24 24"><path d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></svg>
+                    </a>
+                    <a href="https://discord.com/users/al-e-xn" class="social-link" target="_blank" rel="noopener">
+                        <span>Discord</span>
+                        <svg viewBox="0 0 24 24"><path d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></svg>
+                    </a>
+                    <a href="https://t.me/al_e_xn" class="social-link" target="_blank" rel="noopener">
+                        <span>Telegram</span>
+                        <svg viewBox="0 0 24 24" fill="white"><path d="M20.665 3.717l-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42l10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001l-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15l4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.284-1.434z"/></svg>
+                    </a>
+                </div>
+                <div class="credit"><a href="#">Developed by Al_e_xN</a></div>
+            </div>
+        </div>
+    </footer>
+
+</div>
+
+<!-- =================== SCRIPTS =================== -->
+<script>
+    // ======= GAME SWITCHING =======
+    let currentGame = 'snake';
+
+    // Scores for Pong
+    let pongPlayerScore = 0;
+    let pongAiScore = 0;
+
+    function switchGame(game) {
+        // Stop all games
+        if (snakeInterval) { clearInterval(snakeInterval); snakeRunning = false; }
+        if (pongRAF) { cancelAnimationFrame(pongRAF); pongRunning = false; }
+        if (flappyRAF) { cancelAnimationFrame(flappyRAF); flappyRunning = false; }
+        if (arkanoidRAF) { cancelAnimationFrame(arkanoidRAF); arkanoidRunning = false; }
+
+        currentGame = game;
+
+        // Toggle panels
+        document.querySelectorAll('.game-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('panel-' + game).classList.add('active');
+
+        // Toggle tabs
+        document.querySelectorAll('.game-tab').forEach(t => t.classList.remove('active'));
+        document.querySelector(`.game-tab[data-game="${game}"]`).classList.add('active');
+
+        // Update title and score
+        const titleEl = document.getElementById('gameTitle');
+        const scoreEl = document.getElementById('gameScore');
+        const bestEl = document.getElementById('gameBest');
+        
+        // Reset score display row
+        document.getElementById('gameScoreRow').style.display = 'block';
+
+        if (game === 'snake') {
+            titleEl.textContent = 'BORED? PLAY SNAKE';
+            scoreEl.textContent = snakeScore || 0;
+            bestEl.textContent = snakeBestScore || 0;
+            document.getElementById('gameScoreRow').innerHTML = `SCORE: <span id="gameScore">${snakeScore||0}</span> | BEST: <span id="gameBest">${snakeBestScore||0}</span>`;
+        } else if (game === 'pong') {
+            titleEl.textContent = 'BORED? PLAY PONG';
+            // Custom display for Pong score
+            document.getElementById('gameScoreRow').innerHTML = `PLAYER: <span id="pongPScore">0</span> | CPU: <span id="pongCScore">0</span>`;
+        } else if (game === 'flappy') {
+            titleEl.textContent = 'BORED? PLAY FLAPPY';
+            document.getElementById('gameScoreRow').innerHTML = `SCORE: <span id="gameScore">0</span> | BEST: <span id="gameBest">${flappyBestScore||0}</span>`;
+        } else if (game === 'arkanoid') {
+            titleEl.textContent = 'BORED? PLAY ARKANOID';
+            document.getElementById('gameScoreRow').innerHTML = `SCORE: <span id="gameScore">0</span> | BEST: <span id="gameBest">${arkanoidBestScore||0}</span>`;
+        }
+
+        // Redraw idle boards
+        drawSnakeBoard();
+        drawPongBoard();
+        drawFlappyBoard();
+        drawArkanoidBoard();
+    }
+
+    function updateScoreDisplay(score, best) {
+        // Generic update
+        const scoreEl = document.getElementById('gameScore');
+        const bestEl = document.getElementById('gameBest');
+        if(scoreEl) scoreEl.textContent = score;
+        if(bestEl) bestEl.textContent = best;
+    }
+
+    // ======= SMOOTHER PIXEL REVEAL ON SCROLL =======
+    const pixelElements = document.querySelectorAll('.pixel-reveal');
+
+    // FIX: Using threshold 0 to ensure elements reveal even if only a tiny part is visible (fixes horizontal phone view)
+    const observerOptions = {
+        threshold: 0,
+        rootMargin: '0px 0px -30px 0px'
+    };
+
+    function createPixelReveal(element) {
+        const w = element.offsetWidth;
+        const h = element.offsetHeight;
+
+        const canvas = document.createElement('canvas');
+        canvas.classList.add('pixel-reveal-overlay');
+        canvas.width = w;
+        canvas.height = h;
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        element.style.position = element.style.position || 'relative';
+        element.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        element.style.opacity = '1';
+
+        const pixelSize = Math.max(4, Math.floor(Math.min(w, h) / 50));
+        const cols = Math.ceil(w / pixelSize);
+        const rows = Math.ceil(h / pixelSize);
+        const totalCells = cols * rows;
+
+        const cells = [];
+        for (let i = 0; i < totalCells; i++) {
+            const col = i % cols;
+            const row = Math.floor(i / cols);
+            const dist = Math.sqrt(col * col + row * row) / Math.sqrt(cols * cols + rows * rows);
+            cells.push({ idx: i, col, row, dist, rnd: Math.random() });
+        }
+
+        cells.sort((a, b) => (a.dist + a.rnd * 0.2) - (b.dist + b.rnd * 0.2));
+
+        const bgColor = '#F5C842';
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, w, h);
+
+        const totalFrames = 80;
+        const cellsPerFrame = Math.ceil(totalCells / totalFrames);
+        let currentIndex = 0;
+        let frame = 0;
+
+        function animateFrame() {
+            if (frame >= totalFrames) {
+                canvas.remove();
+                return;
+            }
+
+            const batch = cellsPerFrame + Math.floor(Math.random() * 3);
+            for (let i = 0; i < batch && currentIndex < totalCells; i++, currentIndex++) {
+                const cell = cells[currentIndex];
+                ctx.clearRect(cell.col * pixelSize, cell.row * pixelSize, pixelSize, pixelSize);
+            }
+
+            frame++;
+            requestAnimationFrame(animateFrame);
+        }
+
+        requestAnimationFrame(animateFrame);
+    }
+
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animating');
+                createPixelReveal(entry.target);
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    pixelElements.forEach(el => revealObserver.observe(el));
+
+    // =============================================
+    // ============= SNAKE GAME ====================
+    // =============================================
+    const snakeCanvas = document.getElementById('snakeCanvas');
+    const snakeCtx = snakeCanvas.getContext('2d');
+    const snakeStartBtn = document.getElementById('snakeStartBtn');
+
+    const SGRID = 20;
+    const STILE = snakeCanvas.width / SGRID;
+    let snake, snakeFood, snakeDirection, snakeNextDir, snakeScore = 0, snakeBestScore, snakeInterval, snakeRunning = false;
+
+    snakeBestScore = parseInt(localStorage.getItem('snakeBest') || '0');
+
+    drawSnakeBoard();
+
+    function drawSnakeBoard() {
+        snakeCtx.fillStyle = 'rgba(0,0,0,0.05)';
+        snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+        snakeCtx.strokeStyle = 'rgba(255,255,255,0.04)';
+        snakeCtx.lineWidth = 0.5;
+        for (let i = 0; i <= SGRID; i++) {
+            snakeCtx.beginPath();
+            snakeCtx.moveTo(i * STILE, 0);
+            snakeCtx.lineTo(i * STILE, snakeCanvas.height);
+            snakeCtx.stroke();
+            snakeCtx.beginPath();
+            snakeCtx.moveTo(0, i * STILE);
+            snakeCtx.lineTo(snakeCanvas.width, i * STILE);
+            snakeCtx.stroke();
+        }
+    }
+
+    function startSnake() {
+        snake = [{x: 10, y: 10}];
+        snakeDirection = {x: 1, y: 0};
+        snakeNextDir = {x: 1, y: 0};
+        snakeScore = 0;
+        updateScoreDisplay(0, snakeBestScore);
+        snakeRunning = true;
+        snakeStartBtn.textContent = 'RESTART';
+        placeSnakeFood();
+        if (snakeInterval) clearInterval(snakeInterval);
+        snakeInterval = setInterval(snakeLoop, 120);
+    }
+
+    function placeSnakeFood() {
+        let pos;
+        do {
+            pos = { x: Math.floor(Math.random() * SGRID), y: Math.floor(Math.random() * SGRID) };
+        } while (snake.some(s => s.x === pos.x && s.y === pos.y));
+        snakeFood = pos;
+    }
+
+    function snakeLoop() {
+        snakeDirection = {...snakeNextDir};
+        const head = { x: snake[0].x + snakeDirection.x, y: snake[0].y + snakeDirection.y };
+
+        if (head.x < 0 || head.x >= SGRID || head.y < 0 || head.y >= SGRID) { snakeGameOver(); return; }
+        if (snake.some(s => s.x === head.x && s.y === head.y)) { snakeGameOver(); return; }
+
+        snake.unshift(head);
+
+        if (head.x === snakeFood.x && head.y === snakeFood.y) {
+            snakeScore++;
+            if (snakeScore > snakeBestScore) {
+                snakeBestScore = snakeScore;
+                localStorage.setItem('snakeBest', snakeBestScore);
+            }
+            updateScoreDisplay(snakeScore, snakeBestScore);
+            placeSnakeFood();
+        } else {
+            snake.pop();
+        }
+        drawSnakeGame();
+    }
+
+    function drawSnakeGame() {
+        snakeCtx.clearRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+        drawSnakeBoard();
+
+        // Food
+        snakeCtx.fillStyle = '#fff';
+        snakeCtx.shadowColor = 'rgba(255,255,255,0.6)';
+        snakeCtx.shadowBlur = 8;
+        roundRect(snakeCtx, snakeFood.x * STILE + 2, snakeFood.y * STILE + 2, STILE - 4, STILE - 4, 4, true);
+        snakeCtx.shadowBlur = 0;
+
+        // Snake
+        snake.forEach((seg, i) => {
+            const alpha = 1 - (i / snake.length) * 0.5;
+            snakeCtx.fillStyle = i === 0 ? `rgba(255,255,255,${alpha})` : `rgba(255,255,255,${alpha * 0.7})`;
+            roundRect(snakeCtx, seg.x * STILE + 1, seg.y * STILE + 1, STILE - 2, STILE - 2, 4, true);
+        });
+    }
+
+    function snakeGameOver() {
+        snakeRunning = false;
+        clearInterval(snakeInterval);
+        snakeStartBtn.textContent = 'PLAY AGAIN';
+        snakeCtx.fillStyle = 'rgba(255,255,255,0.15)';
+        snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+        snakeCtx.fillStyle = 'rgba(255,255,255,0.9)';
+        snakeCtx.font = '900 24px "Exo 2", sans-serif';
+        snakeCtx.textAlign = 'center';
+        snakeCtx.fillText('GAME OVER', snakeCanvas.width / 2, snakeCanvas.height / 2 - 10);
+        snakeCtx.font = '200 14px "JetBrains Mono", monospace';
+        snakeCtx.fillText('Score: ' + snakeScore, snakeCanvas.width / 2, snakeCanvas.height / 2 + 20);
+    }
+
+    function snakeDir(dir) {
+        if (!snakeRunning) return;
+        switch(dir) {
+            case 'up': if (snakeDirection.y !== 1) snakeNextDir = {x:0,y:-1}; break;
+            case 'down': if (snakeDirection.y !== -1) snakeNextDir = {x:0,y:1}; break;
+            case 'left': if (snakeDirection.x !== 1) snakeNextDir = {x:-1,y:0}; break;
+            case 'right': if (snakeDirection.x !== -1) snakeNextDir = {x:1,y:0}; break;
+        }
+    }
+
+    // Snake swipe
+    let snakeTouchX = 0, snakeTouchY = 0;
+    snakeCanvas.addEventListener('touchstart', (e) => {
+        snakeTouchX = e.touches[0].clientX;
+        snakeTouchY = e.touches[0].clientY;
+    }, {passive: true});
+    snakeCanvas.addEventListener('touchend', (e) => {
+        if (!snakeRunning) return;
+        const dx = e.changedTouches[0].clientX - snakeTouchX;
+        const dy = e.changedTouches[0].clientY - snakeTouchY;
+        if (Math.abs(dx) > Math.abs(dy)) {
+            if (dx > 20 && snakeDirection.x !== -1) snakeNextDir = {x:1,y:0};
+            else if (dx < -20 && snakeDirection.x !== 1) snakeNextDir = {x:-1,y:0};
+        } else {
+            if (dy > 20 && snakeDirection.y !== -1) snakeNextDir = {x:0,y:1};
+            else if (dy < -20 && snakeDirection.y !== 1) snakeNextDir = {x:0,y:-1};
+        }
+    }, {passive: true});
+
+    // =============================================
+    // ============= PONG GAME ============
+    // =============================================
+    const pongCanvas = document.getElementById('pongCanvas');
+    const pongCtx = pongCanvas.getContext('2d');
+    const pongStartBtn = document.getElementById('pongStartBtn');
+
+    const PW = pongCanvas.width;
+    const PH = pongCanvas.height;
+    const PADDLE_W = 12;
+    const PADDLE_H = 70;
+    const BALL_R = 8;
+
+    let pongRunning = false;
+    let pongRAF = null;
+
+    let paddleL = { x: 15, y: PH / 2 - PADDLE_H / 2, w: PADDLE_W, h: PADDLE_H, dy: 0 };
+    let paddleR = { x: PW - 15 - PADDLE_W, y: PH / 2 - PADDLE_H / 2, w: PADDLE_W, h: PADDLE_H, dy: 0 };
+    let ball = { x: PW / 2, y: PH / 2, vx: 4, vy: 3, r: BALL_R };
+
+    let pongKeysDown = {};
+    let pongInputState = { up: false, down: false }; // Instruction 6: continuous input
+
+    drawPongBoard();
+
+    function updatePongScore() {
+        const pEl = document.getElementById('pongPScore');
+        const cEl = document.getElementById('pongCScore');
+        if(pEl) pEl.textContent = pongPlayerScore;
+        if(cEl) cEl.textContent = pongAiScore;
+    }
+
+    function drawPongBoard() {
+        pongCtx.fillStyle = 'rgba(0,0,0,0.05)';
+        pongCtx.fillRect(0, 0, PW, PH);
+        pongCtx.setLineDash([6, 8]);
+        pongCtx.strokeStyle = 'rgba(255,255,255,0.1)';
+        pongCtx.lineWidth = 2;
+        pongCtx.beginPath();
+        pongCtx.moveTo(PW / 2, 0);
+        pongCtx.lineTo(PW / 2, PH);
+        pongCtx.stroke();
+        pongCtx.setLineDash([]);
+        pongCtx.fillStyle = 'rgba(255,255,255,0.3)';
+        roundRect(pongCtx, paddleL.x, PH / 2 - PADDLE_H / 2, PADDLE_W, PADDLE_H, 4, true);
+        roundRect(pongCtx, paddleR.x, PH / 2 - PADDLE_H / 2, PADDLE_W, PADDLE_H, 4, true);
+    }
+
+    function startPong() {
+        paddleL.y = PH / 2 - PADDLE_H / 2;
+        paddleL.dy = 0;
+        paddleR.y = PH / 2 - PADDLE_H / 2;
+        paddleR.dy = 0;
+        resetBall(null);
+        
+        pongPlayerScore = 0;
+        pongAiScore = 0;
+        updatePongScore();
+
+        pongRunning = true;
+        pongStartBtn.textContent = 'RESTART';
+        if (pongRAF) cancelAnimationFrame(pongRAF);
+        pongLoop();
+    }
+
+    // Instruction 6: Ball direction after goal logic
+    function resetBall(winner) {
+        ball.x = PW / 2;
+        ball.y = PH / 2;
+        
+        if (winner === 'player') {
+            // Player scored, usually ball goes to opponent, or neutral. 
+            // Let's randomize for generic serve or serve to loser.
+            ball.vx = -4; // Serve towards player
+        } else if (winner === 'cpu') {
+            // Instruction 6: "after goal scored against player [cpu scored], ball should fly towards cpu"
+            // If ball flies towards CPU, vx should be positive.
+            ball.vx = 4; 
+        } else {
+             // Start of game
+             ball.vx = (Math.random() > 0.5 ? 1 : -1) * 4;
+        }
+
+        ball.vy = (Math.random() - 0.5) * 6;
+    }
+
+    function pongLoop() {
+        if (!pongRunning) return;
+        
+        // Player Movement (Keyboard + Touch State)
+        if (pongKeysDown['ArrowUp'] || pongInputState.up) {
+            paddleL.dy = -5;
+        } else if (pongKeysDown['ArrowDown'] || pongInputState.down) {
+            paddleL.dy = 5;
+        } else {
+            paddleL.dy *= 0.8;
+        }
+        paddleL.y += paddleL.dy;
+        paddleL.y = Math.max(0, Math.min(PH - PADDLE_H, paddleL.y));
+
+        // AI Movement
+        const aiTarget = ball.y - PADDLE_H / 2;
+        const aiSpeed = 3.5;
+        if (paddleR.y < aiTarget - 5) paddleR.y += aiSpeed;
+        else if (paddleR.y > aiTarget + 5) paddleR.y -= aiSpeed;
+        paddleR.y = Math.max(0, Math.min(PH - PADDLE_H, paddleR.y));
+
+        // Ball Physics
+        ball.x += ball.vx;
+        ball.y += ball.vy;
+
+        // Top/Bottom walls
+        if (ball.y - ball.r <= 0) { ball.y = ball.r; ball.vy = Math.abs(ball.vy); }
+        if (ball.y + ball.r >= PH) { ball.y = PH - ball.r; ball.vy = -Math.abs(ball.vy); }
+
+        // Paddle L Hit
+        if (ball.vx < 0 &&
+            ball.x - ball.r <= paddleL.x + paddleL.w &&
+            ball.x + ball.r >= paddleL.x &&
+            ball.y >= paddleL.y &&
+            ball.y <= paddleL.y + PADDLE_H) {
+            ball.vx = Math.abs(ball.vx) * 1.05;
+            ball.vy += paddleL.dy * 0.3;
+            ball.x = paddleL.x + paddleL.w + ball.r;
+        }
+
+        // Paddle R Hit
+        if (ball.vx > 0 &&
+            ball.x + ball.r >= paddleR.x &&
+            ball.x - ball.r <= paddleR.x + paddleR.w &&
+            ball.y >= paddleR.y &&
+            ball.y <= paddleR.y + PADDLE_H) {
+            ball.vx = -Math.abs(ball.vx) * 1.05;
+            ball.vy += paddleR.dy * 0.3;
+            ball.x = paddleR.x - ball.r;
+        }
+
+        const maxSpeed = 10;
+        if (Math.abs(ball.vx) > maxSpeed) ball.vx = maxSpeed * Math.sign(ball.vx);
+        if (Math.abs(ball.vy) > maxSpeed) ball.vy = maxSpeed * Math.sign(ball.vy);
+
+        // Scoring
+        if (ball.x < 0) {
+            // AI Scored (Goal against player)
+            pongAiScore++;
+            updatePongScore();
+            resetBall('cpu');
+        } else if (ball.x > PW) {
+            // Player Scored
+            pongPlayerScore++;
+            updatePongScore();
+            resetBall('player');
+        }
+
+        drawPongGame();
+        pongRAF = requestAnimationFrame(pongLoop);
+    }
+
+    function drawPongGame() {
+        pongCtx.clearRect(0, 0, PW, PH);
+        pongCtx.fillStyle = 'rgba(0,0,0,0.05)';
+        pongCtx.fillRect(0, 0, PW, PH);
+        pongCtx.setLineDash([6, 8]);
+        pongCtx.strokeStyle = 'rgba(255,255,255,0.08)';
+        pongCtx.lineWidth = 2;
+        pongCtx.beginPath();
+        pongCtx.moveTo(PW / 2, 0);
+        pongCtx.lineTo(PW / 2, PH);
+        pongCtx.stroke();
+        pongCtx.setLineDash([]);
+
+        pongCtx.fillStyle = 'rgba(255,255,255,0.9)';
+        pongCtx.shadowColor = 'rgba(255,255,255,0.4)';
+        pongCtx.shadowBlur = 6;
+        roundRect(pongCtx, paddleL.x, paddleL.y, PADDLE_W, PADDLE_H, 4, true);
+        pongCtx.fillStyle = 'rgba(255,255,255,0.6)';
+        roundRect(pongCtx, paddleR.x, paddleR.y, PADDLE_W, PADDLE_H, 4, true);
+        pongCtx.shadowBlur = 0;
+
+        pongCtx.fillStyle = '#fff';
+        pongCtx.shadowColor = 'rgba(255,255,255,0.6)';
+        pongCtx.shadowBlur = 10;
+        pongCtx.beginPath();
+        pongCtx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+        pongCtx.fill();
+        pongCtx.shadowBlur = 0;
+    }
+
+    // Instruction 6: Smooth touch controls
+    function pongInput(active, dir) {
+        if (!pongRunning) return;
+        if (dir === 'up') pongInputState.up = active;
+        if (dir === 'down') pongInputState.down = active;
+    }
+
+    let pongTouchY = 0;
+    pongCanvas.addEventListener('touchstart', (e) => {
+        pongTouchY = e.touches[0].clientX;
+    }, {passive: true});
+    pongCanvas.addEventListener('touchmove', (e) => {
+        if (!pongRunning) return;
+        const dy = e.touches[0].clientY - pongTouchY;
+        pongTouchY = e.touches[0].clientY;
+        paddleL.y += dy;
+        paddleL.y = Math.max(0, Math.min(PH - PADDLE_H, paddleL.y));
+    }, {passive: true});
+
+    // =============================================
+    // ============= FLAPPY BIRD GAME ==============
+    // =============================================
+    const flappyCanvas = document.getElementById('flappyCanvas');
+    const flappyCtx = flappyCanvas.getContext('2d');
+    const flappyStartBtn = document.getElementById('flappyStartBtn');
+
+    const FW = flappyCanvas.width;
+    const FH = flappyCanvas.height;
+
+    let flappyRunning = false;
+    let flappyRAF = null;
+    let flappyBestScore = parseInt(localStorage.getItem('flappyBest') || '0');
+    let flappyScoreVal = 0;
+
+    let bird = { x: 80, y: FH / 2, vy: 0, w: 20, h: 16 };
+    const GRAVITY = 0.45;
+    const FLAP_FORCE = -7;
+
+    let pipes = [];
+    const PIPE_W = 45;
+    const PIPE_GAP = 110;
+    const PIPE_SPEED = 2.5;
+    let pipeTimer = 0;
+    const PIPE_INTERVAL = 90;
+
+    drawFlappyBoard();
+
+    function drawFlappyBoard() {
+        flappyCtx.fillStyle = 'rgba(0,0,0,0.05)';
+        flappyCtx.fillRect(0, 0, FW, FH);
+        flappyCtx.strokeStyle = 'rgba(255,255,255,0.15)';
+        flappyCtx.lineWidth = 2;
+        flappyCtx.beginPath();
+        flappyCtx.moveTo(0, FH - 20);
+        flappyCtx.lineTo(FW, FH - 20);
+        flappyCtx.stroke();
+        flappyCtx.fillStyle = 'rgba(255,255,255,0.3)';
+        drawBird(flappyCtx, 80, FH / 2);
+    }
+
+    function drawBird(ctx, x, y) {
+        ctx.beginPath();
+        ctx.arc(x, y, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(x - 5, y + 2, 8, 5, -0.3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(0,0,0,0.5)';
+        ctx.beginPath();
+        ctx.arc(x + 5, y - 3, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(255,200,50,0.8)';
+        ctx.beginPath();
+        ctx.moveTo(x + 10, y - 1);
+        ctx.lineTo(x + 17, y + 2);
+        ctx.lineTo(x + 10, y + 4);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    function startFlappy() {
+        bird.x = 80;
+        bird.y = FH / 2;
+        bird.vy = FLAP_FORCE; 
+        pipes = [];
+        pipeTimer = 0;
+        flappyScoreVal = 0;
+        updateScoreDisplay(0, flappyBestScore);
+        flappyRunning = true;
+        flappyStartBtn.textContent = 'RESTART';
+        if (flappyRAF) cancelAnimationFrame(flappyRAF);
+        flappyLoop();
+    }
+
+    function flappyFlap() {
+        if (!flappyRunning) return;
+        bird.vy = FLAP_FORCE;
+    }
+
+    function flappyLoop() {
+        if (!flappyRunning) return;
+
+        bird.vy += GRAVITY;
+        bird.y += bird.vy;
+
+        if (bird.y + 10 >= FH - 20) { flappyGameOver(); return; }
+        if (bird.y - 10 <= 0) { bird.y = 10; bird.vy = 0; }
+
+        pipeTimer++;
+        if (pipeTimer >= PIPE_INTERVAL) {
+            pipeTimer = 0;
+            const gapY = 60 + Math.random() * (FH - 160);
+            pipes.push({ x: FW, gapY: gapY, scored: false });
+        }
+
+        for (let i = pipes.length - 1; i >= 0; i--) {
+            pipes[i].x -= PIPE_SPEED;
+            if (pipes[i].x + PIPE_W < 0) {
+                pipes.splice(i, 1);
+                continue;
+            }
+            if (!pipes[i].scored && pipes[i].x + PIPE_W < bird.x) {
+                pipes[i].scored = true;
+                flappyScoreVal++;
+                if (flappyScoreVal > flappyBestScore) {
+                    flappyBestScore = flappyScoreVal;
+                    localStorage.setItem('flappyBest', flappyBestScore);
+                }
+                updateScoreDisplay(flappyScoreVal, flappyBestScore);
+            }
+            if (bird.x + 10 > pipes[i].x && bird.x - 10 < pipes[i].x + PIPE_W) {
+                if (bird.y - 10 < pipes[i].gapY - PIPE_GAP / 2 || bird.y + 10 > pipes[i].gapY + PIPE_GAP / 2) {
+                    flappyGameOver();
+                    return;
+                }
+            }
+        }
+
+        drawFlappyGame();
+        flappyRAF = requestAnimationFrame(flappyLoop);
+    }
+
+    function drawFlappyGame() {
+        flappyCtx.clearRect(0, 0, FW, FH);
+        flappyCtx.fillStyle = 'rgba(0,0,0,0.05)';
+        flappyCtx.fillRect(0, 0, FW, FH);
+
+        flappyCtx.strokeStyle = 'rgba(255,255,255,0.15)';
+        flappyCtx.lineWidth = 2;
+        flappyCtx.beginPath();
+        flappyCtx.moveTo(0, FH - 20);
+        flappyCtx.lineTo(FW, FH - 20);
+        flappyCtx.stroke();
+
+        flappyCtx.fillStyle = 'rgba(255,255,255,0.04)';
+        flappyCtx.fillRect(0, FH - 20, FW, 20);
+
+        pipes.forEach(pipe => {
+            const topH = pipe.gapY - PIPE_GAP / 2;
+            const botY = pipe.gapY + PIPE_GAP / 2;
+            const botH = FH - 20 - botY;
+
+            flappyCtx.fillStyle = 'rgba(255,255,255,0.25)';
+            flappyCtx.shadowColor = 'rgba(255,255,255,0.2)';
+            flappyCtx.shadowBlur = 4;
+            roundRect(flappyCtx, pipe.x, 0, PIPE_W, topH, 6, true);
+            flappyCtx.fillStyle = 'rgba(255,255,255,0.35)';
+            roundRect(flappyCtx, pipe.x - 4, topH - 14, PIPE_W + 8, 14, 4, true);
+            flappyCtx.fillStyle = 'rgba(255,255,255,0.25)';
+            roundRect(flappyCtx, pipe.x, botY, PIPE_W, botH, 6, true);
+            flappyCtx.fillStyle = 'rgba(255,255,255,0.35)';
+            roundRect(flappyCtx, pipe.x - 4, botY, PIPE_W + 8, 14, 4, true);
+            flappyCtx.shadowBlur = 0;
+        });
+
+        const birdAngle = Math.min(Math.max(bird.vy * 0.05, -0.5), 0.5);
+        flappyCtx.save();
+        flappyCtx.translate(bird.x, bird.y);
+        flappyCtx.rotate(birdAngle);
+        flappyCtx.fillStyle = 'rgba(255,255,255,0.9)';
+        flappyCtx.shadowColor = 'rgba(255,255,255,0.5)';
+        flappyCtx.shadowBlur = 8;
+        drawBird(flappyCtx, 0, 0);
+        flappyCtx.shadowBlur = 0;
+        flappyCtx.restore();
+
+        flappyCtx.fillStyle = 'rgba(255,255,255,0.7)';
+        flappyCtx.font = '900 32px "Exo 2", sans-serif';
+        flappyCtx.textAlign = 'center';
+        flappyCtx.fillText(flappyScoreVal, FW / 2, 50);
+    }
+
+    function flappyGameOver() {
+        flappyRunning = false;
+        flappyStartBtn.textContent = 'PLAY AGAIN';
+        flappyCtx.fillStyle = 'rgba(255,255,255,0.15)';
+        flappyCtx.fillRect(0, 0, FW, FH);
+        flappyCtx.fillStyle = 'rgba(255,255,255,0.9)';
+        flappyCtx.font = '900 24px "Exo 2", sans-serif';
+        flappyCtx.textAlign = 'center';
+        flappyCtx.fillText('GAME OVER', FW / 2, FH / 2 - 10);
+        flappyCtx.font = '200 14px "JetBrains Mono", monospace';
+        flappyCtx.fillText('Score: ' + flappyScoreVal, FW / 2, FH / 2 + 20);
+    }
+
+    flappyCanvas.addEventListener('touchstart', (e) => {
+        if (flappyRunning) flappyFlap();
+    }, {passive: true});
+    flappyCanvas.addEventListener('click', (e) => {
+        if (flappyRunning) flappyFlap();
+    });
+
+    // =============================================
+    // ============= ARKANOID GAME =================
+    // =============================================
+    const arkanoidCanvas = document.getElementById('arkanoidCanvas');
+    const arkanoidCtx = arkanoidCanvas.getContext('2d');
+    const arkanoidStartBtn = document.getElementById('arkanoidStartBtn');
+
+    const AW = arkanoidCanvas.width;
+    const AH = arkanoidCanvas.height;
+
+    let arkanoidRunning = false;
+    let arkanoidRAF = null;
+    let arkanoidBestScore = parseInt(localStorage.getItem('arkanoidBest') || '0');
+    let arkanoidScoreVal = 0;
+
+    // Paddle
+    const ARK_PADDLE_W = 80;
+    const ARK_PADDLE_H = 12;
+    let arkPaddle = { x: AW / 2 - ARK_PADDLE_W / 2, y: AH - 30, w: ARK_PADDLE_W, h: ARK_PADDLE_H, dx: 0 };
+
+    // Ball
+    const ARK_BALL_R = 6;
+    let arkBall = { x: AW / 2, y: AH - 50, vx: 3, vy: -3, r: ARK_BALL_R };
+
+    // Bricks
+    const BRICK_ROWS = 5;
+    const BRICK_COLS = 8;
+    const BRICK_W = 42;
+    const BRICK_H = 16;
+    const BRICK_PAD = 6;
+    const BRICK_OFFSET_TOP = 40;
+    const BRICK_OFFSET_LEFT = (AW - (BRICK_COLS * (BRICK_W + BRICK_PAD) - BRICK_PAD)) / 2;
+    let bricks = [];
+
+    let arkanoidKeysDown = {};
+    let arkanoidInputState = { left: false, right: false }; // INSTRUCTION: Continuous movement state
+
+    drawArkanoidBoard();
+
+    function initBricks() {
+        bricks = [];
+        for (let r = 0; r < BRICK_ROWS; r++) {
+            for (let c = 0; c < BRICK_COLS; c++) {
+                bricks.push({
+                    x: BRICK_OFFSET_LEFT + c * (BRICK_W + BRICK_PAD),
+                    y: BRICK_OFFSET_TOP + r * (BRICK_H + BRICK_PAD),
+                    w: BRICK_W,
+                    h: BRICK_H,
+                    alive: true,
+                    color: `rgba(255,255,255,${0.3 + (BRICK_ROWS - r) * 0.12})`
+                });
+            }
+        }
+    }
+
+    function drawArkanoidBoard() {
+        arkanoidCtx.fillStyle = 'rgba(0,0,0,0.05)';
+        arkanoidCtx.fillRect(0, 0, AW, AH);
+
+        // Grid
+        arkanoidCtx.strokeStyle = 'rgba(255,255,255,0.03)';
+        arkanoidCtx.lineWidth = 0.5;
+        for (let i = 0; i <= 20; i++) {
+            const step = AW / 20;
+            arkanoidCtx.beginPath();
+            arkanoidCtx.moveTo(i * step, 0);
+            arkanoidCtx.lineTo(i * step, AH);
+            arkanoidCtx.stroke();
+            arkanoidCtx.beginPath();
+            arkanoidCtx.moveTo(0, i * step);
+            arkanoidCtx.lineTo(AW, i * step);
+            arkanoidCtx.stroke();
+        }
+
+        // Idle paddle
+        arkanoidCtx.fillStyle = 'rgba(255,255,255,0.3)';
+        roundRect(arkanoidCtx, AW / 2 - ARK_PADDLE_W / 2, AH - 30, ARK_PADDLE_W, ARK_PADDLE_H, 4, true);
+
+        // Idle bricks preview
+        for (let r = 0; r < BRICK_ROWS; r++) {
+            for (let c = 0; c < BRICK_COLS; c++) {
+                const bx = BRICK_OFFSET_LEFT + c * (BRICK_W + BRICK_PAD);
+                const by = BRICK_OFFSET_TOP + r * (BRICK_H + BRICK_PAD);
+                arkanoidCtx.fillStyle = `rgba(255,255,255,${0.15 + (BRICK_ROWS - r) * 0.05})`;
+                roundRect(arkanoidCtx, bx, by, BRICK_W, BRICK_H, 3, true);
+            }
+        }
+
+        // Idle ball
+        arkanoidCtx.fillStyle = 'rgba(255,255,255,0.3)';
+        arkanoidCtx.beginPath();
+        arkanoidCtx.arc(AW / 2, AH - 50, ARK_BALL_R, 0, Math.PI * 2);
+        arkanoidCtx.fill();
+    }
+
+    function startArkanoid() {
+        arkPaddle.x = AW / 2 - ARK_PADDLE_W / 2;
+        arkPaddle.dx = 0;
+        arkBall.x = AW / 2;
+        arkBall.y = AH - 50;
+        arkBall.vx = (Math.random() > 0.5 ? 1 : -1) * 3;
+        arkBall.vy = -4;
+        arkanoidScoreVal = 0;
+        updateScoreDisplay(0, arkanoidBestScore);
+        initBricks();
+        arkanoidRunning = true;
+        arkanoidStartBtn.textContent = 'RESTART';
+        if (arkanoidRAF) cancelAnimationFrame(arkanoidRAF);
+        arkanoidLoop();
+    }
+
+    function arkanoidLoop() {
+        if (!arkanoidRunning) return;
+
+        // INSTRUCTION: Check hold state for continuous movement
+        if (arkanoidKeysDown['ArrowLeft'] || arkanoidInputState.left) {
+            arkPaddle.dx = -8;
+        } else if (arkanoidKeysDown['ArrowRight'] || arkanoidInputState.right) {
+            arkPaddle.dx = 8;
+        } else {
+            arkPaddle.dx *= 0.85;
+        }
+        arkPaddle.x += arkPaddle.dx;
+        arkPaddle.x = Math.max(0, Math.min(AW - ARK_PADDLE_W, arkPaddle.x));
+
+        // Ball movement
+        arkBall.x += arkBall.vx;
+        arkBall.y += arkBall.vy;
+
+        // Wall collisions
+        if (arkBall.x - arkBall.r <= 0) { arkBall.x = arkBall.r; arkBall.vx = Math.abs(arkBall.vx); }
+        if (arkBall.x + arkBall.r >= AW) { arkBall.x = AW - arkBall.r; arkBall.vx = -Math.abs(arkBall.vx); }
+        if (arkBall.y - arkBall.r <= 0) { arkBall.y = arkBall.r; arkBall.vy = Math.abs(arkBall.vy); }
+
+        // Paddle collision
+        if (arkBall.vy > 0 &&
+            arkBall.y + arkBall.r >= arkPaddle.y &&
+            arkBall.y - arkBall.r <= arkPaddle.y + arkPaddle.h &&
+            arkBall.x >= arkPaddle.x &&
+            arkBall.x <= arkPaddle.x + arkPaddle.w) {
+            arkBall.vy = -Math.abs(arkBall.vy);
+            arkBall.y = arkPaddle.y - arkBall.r;
+            // Add paddle movement influence
+            arkBall.vx += arkPaddle.dx * 0.2;
+            // Limit horizontal speed
+            if (Math.abs(arkBall.vx) > 6) arkBall.vx = 6 * Math.sign(arkBall.vx);
+        }
+
+        // Brick collision
+        for (let i = 0; i < bricks.length; i++) {
+            const b = bricks[i];
+            if (!b.alive) continue;
+
+            if (arkBall.x + arkBall.r > b.x &&
+                arkBall.x - arkBall.r < b.x + b.w &&
+                arkBall.y + arkBall.r > b.y &&
+                arkBall.y - arkBall.r < b.y + b.h) {
+
+                b.alive = false;
+                arkanoidScoreVal += 10;
+                if (arkanoidScoreVal > arkanoidBestScore) {
+                    arkanoidBestScore = arkanoidScoreVal;
+                    localStorage.setItem('arkanoidBest', arkanoidBestScore);
+                }
+                updateScoreDisplay(arkanoidScoreVal, arkanoidBestScore);
+
+                // Determine bounce direction
+                const overlapLeft = arkBall.x + arkBall.r - b.x;
+                const overlapRight = b.x + b.w - (arkBall.x - arkBall.r);
+                const overlapTop = arkBall.y + arkBall.r - b.y;
+                const overlapBottom = b.y + b.h - (arkBall.y - arkBall.r);
+
+                const minOverlapX = Math.min(overlapLeft, overlapRight);
+                const minOverlapY = Math.min(overlapTop, overlapBottom);
+
+                if (minOverlapX < minOverlapY) {
+                    arkBall.vx = -arkBall.vx;
+                } else {
+                    arkBall.vy = -arkBall.vy;
+                }
+                break;
+            }
+        }
+
+        // Check win
+        if (bricks.every(b => !b.alive)) {
+            arkanoidWin();
+            return;
+        }
+
+        // Ball out of bounds (bottom)
+        if (arkBall.y + arkBall.r >= AH) {
+            arkanoidGameOver();
+            return;
+        }
+
+        drawArkanoidGame();
+        arkanoidRAF = requestAnimationFrame(arkanoidLoop);
+    }
+
+    function drawArkanoidGame() {
+        arkanoidCtx.clearRect(0, 0, AW, AH);
+        arkanoidCtx.fillStyle = 'rgba(0,0,0,0.05)';
+        arkanoidCtx.fillRect(0, 0, AW, AH);
+
+        // Grid
+        arkanoidCtx.strokeStyle = 'rgba(255,255,255,0.03)';
+        arkanoidCtx.lineWidth = 0.5;
+        for (let i = 0; i <= 20; i++) {
+            const step = AW / 20;
+            arkanoidCtx.beginPath();
+            arkanoidCtx.moveTo(i * step, 0);
+            arkanoidCtx.lineTo(i * step, AH);
+            arkanoidCtx.stroke();
+            arkanoidCtx.beginPath();
+            arkanoidCtx.moveTo(0, i * step);
+            arkanoidCtx.lineTo(AW, i * step);
+            arkanoidCtx.stroke();
+        }
+
+        // Bricks
+        bricks.forEach(b => {
+            if (!b.alive) return;
+            arkanoidCtx.fillStyle = b.color;
+            arkanoidCtx.shadowColor = 'rgba(255,255,255,0.3)';
+            arkanoidCtx.shadowBlur = 4;
+            roundRect(arkanoidCtx, b.x, b.y, b.w, b.h, 3, true);
+        });
+        arkanoidCtx.shadowBlur = 0;
+
+        // Paddle
+        arkanoidCtx.fillStyle = 'rgba(255,255,255,0.9)';
+        arkanoidCtx.shadowColor = 'rgba(255,255,255,0.5)';
+        arkanoidCtx.shadowBlur = 6;
+        roundRect(arkanoidCtx, arkPaddle.x, arkPaddle.y, arkPaddle.w, arkPaddle.h, 4, true);
+        arkanoidCtx.shadowBlur = 0;
+
+        // Ball
+        arkanoidCtx.fillStyle = '#fff';
+        arkanoidCtx.shadowColor = 'rgba(255,255,255,0.6)';
+        arkanoidCtx.shadowBlur = 8;
+        arkanoidCtx.beginPath();
+        arkanoidCtx.arc(arkBall.x, arkBall.y, arkBall.r, 0, Math.PI * 2);
+        arkanoidCtx.fill();
+        arkanoidCtx.shadowBlur = 0;
+
+        // Score on canvas
+        arkanoidCtx.fillStyle = 'rgba(255,255,255,0.5)';
+        arkanoidCtx.font = '900 18px "Exo 2", sans-serif';
+        arkanoidCtx.textAlign = 'left';
+        arkanoidCtx.fillText('SCORE: ' + arkanoidScoreVal, 10, 25);
+    }
+
+    function arkanoidGameOver() {
+        arkanoidRunning = false;
+        arkanoidStartBtn.textContent = 'PLAY AGAIN';
+        arkanoidCtx.fillStyle = 'rgba(255,255,255,0.15)';
+        arkanoidCtx.fillRect(0, 0, AW, AH);
+        arkanoidCtx.fillStyle = 'rgba(255,255,255,0.9)';
+        arkanoidCtx.font = '900 24px "Exo 2", sans-serif';
+        arkanoidCtx.textAlign = 'center';
+        arkanoidCtx.fillText('GAME OVER', AW / 2, AH / 2 - 10);
+        arkanoidCtx.font = '200 14px "JetBrains Mono", monospace';
+        arkanoidCtx.fillText('Score: ' + arkanoidScoreVal, AW / 2, AH / 2 + 20);
+    }
+
+    function arkanoidWin() {
+        arkanoidRunning = false;
+        arkanoidStartBtn.textContent = 'PLAY AGAIN';
+        arkanoidCtx.fillStyle = 'rgba(255,255,255,0.15)';
+        arkanoidCtx.fillRect(0, 0, AW, AH);
+        arkanoidCtx.fillStyle = 'rgba(255,255,255,0.9)';
+        arkanoidCtx.font = '900 24px "Exo 2", sans-serif';
+        arkanoidCtx.textAlign = 'center';
+        arkanoidCtx.fillText('YOU WIN!', AW / 2, AH / 2 - 10);
+        arkanoidCtx.font = '200 14px "JetBrains Mono", monospace';
+        arkanoidCtx.fillText('Score: ' + arkanoidScoreVal, AW / 2, AH / 2 + 20);
+    }
+
+    // New helper for continuous input
+    function setArkanoidInput(e, active, dir) {
+        if(e && e.cancelable) e.preventDefault(); // Prevent scrolling/ghost clicks
+        if (!arkanoidRunning) return;
+        if (dir === 'left') arkanoidInputState.left = active;
+        if (dir === 'right') arkanoidInputState.right = active;
+    }
+
+    // Arkanoid touch (slide on canvas)
+    let arkTouchX = 0;
+    arkanoidCanvas.addEventListener('touchstart', (e) => {
+        arkTouchX = e.touches[0].clientX;
+    }, {passive: true});
+    arkanoidCanvas.addEventListener('touchmove', (e) => {
+        if (!arkanoidRunning) return;
+        const dx = e.touches[0].clientX - arkTouchX;
+        arkTouchX = e.touches[0].clientX;
+        arkPaddle.x += dx;
+        arkPaddle.x = Math.max(0, Math.min(AW - ARK_PADDLE_W, arkPaddle.x));
+    }, {passive: true});
+
+    // =============================================
+    // =========== SHARED KEYBOARD HANDLER =========
+    // =============================================
+    document.addEventListener('keydown', (e) => {
+        // Prevent scrolling when playing Pong (and other games)
+        if (currentGame === 'pong' && pongRunning) {
+             if (['ArrowUp', 'ArrowDown'].includes(e.key)) {
+                 e.preventDefault();
+             }
+        }
+        
+        pongKeysDown[e.key] = true;
+        arkanoidKeysDown[e.key] = true;
+
+        if (currentGame === 'snake' && snakeRunning) {
+            // Prevent default scroll for snake too
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                e.preventDefault();
+            }
+
+            switch(e.key) {
+                case 'ArrowUp': 
+                    if (snakeDirection.y !== 1) snakeNextDir = {x:0,y:-1}; break;
+                case 'ArrowDown': 
+                    if (snakeDirection.y !== -1) snakeNextDir = {x:0,y:1}; break;
+                case 'ArrowLeft': 
+                    if (snakeDirection.x !== 1) snakeNextDir = {x:-1,y:0}; break;
+                case 'ArrowRight': 
+                    if (snakeDirection.x !== -1) snakeNextDir = {x:1,y:0}; break;
+            }
+        }
+
+        if (currentGame === 'flappy' && flappyRunning) {
+            if (e.key === ' ' || e.key === 'ArrowUp') {
+                flappyFlap();
+                e.preventDefault();
+            }
+        }
+
+        if (currentGame === 'arkanoid' && arkanoidRunning) {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                e.preventDefault();
+            }
+        }
+    });
+
+    document.addEventListener('keyup', (e) => {
+        delete pongKeysDown[e.key];
+        delete arkanoidKeysDown[e.key];
+    });
+
+    // =============================================
+    // ============ SHARED ROUND RECT ==============
+    // =============================================
+    function roundRect(c, x, y, w, h, r, fill) {
+        c.beginPath();
+        c.moveTo(x + r, y);
+        c.lineTo(x + w - r, y);
+        c.quadraticCurveTo(x + w, y, x + w, y + r);
+        c.lineTo(x + w, y + h - r);
+        c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        c.lineTo(x + r, y + h);
+        c.quadraticCurveTo(x, y + h, x, y + h - r);
+        c.lineTo(x, y + r);
+        c.quadraticCurveTo(x, y, x + r, y);
+        c.closePath();
+        if (fill) c.fill();
+    }
+
+    // Init score display
+    updateScoreDisplay(0, snakeBestScore);
+</script>
+
+</body>
+</html>
