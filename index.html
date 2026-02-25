@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@900&family=JetBrains+Mono:wght@100;200;300;400&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" sizes="32x32" href="stuff/favicon.png">
     <style>
         :root {
             --bg-color: #F5C842;
@@ -1265,86 +1266,223 @@
 
         <h2>MY WORKS</h2>
 
-        <!-- Work 1 -->
-        <div class="work-item left">
-            <div class="work-card" style="transform:rotate(-2deg);">
-                <iframe class="work-img" src="https://www.youtube.com/embed/ByeUJysGsmU?rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                <div class="work-caption">I and my friends made a video about hide and seek.</div>
-            </div>
-            <div class="work-quote">
-                <span class="quote-mark open"></span>
-                <div class="quote-text">All is well! I'm loading a video.</div>
-                <span class="quote-mark close"></span>
+<!-- Work 1 -->
+<div class="work-item left">
+    <div class="work-card" style="transform:rotate(-2deg);">
+        <div class="video-wrapper">
+            <iframe class="work-img youtube-iframe" src="https://www.youtube.com/embed/ByeUJysGsmU?rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            <div class="custom-thumbnail" onclick="playVideo(this)">
+                <img src="stuff/1Pr.png" alt="Video thumbnail">
+                <div class="youtube-play-button"></div>
             </div>
         </div>
+        <div class="work-caption">I and my friends made a video about hide and seek.</div>
+    </div>
+    <div class="work-quote">
+        <span class="quote-mark open"></span>
+        <div class="quote-text">All is well! I'm loading a video.</div>
+        <span class="quote-mark close"></span>
+    </div>
+</div>
 
-        <!-- Work 2 -->
-        <div class="work-item right">
-            <div class="work-card" style="transform:rotate(1.5deg);">
-                 <iframe class="work-img" src="https://www.youtube.com/embed/aCKnjn6tRGc?rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                <div class="work-caption">Made a true crime video in a very short time.</div>
-            </div>
-            <div class="work-quote">
-                <span class="quote-mark open"></span>
-                <div class="quote-text">I like it.<br>The atmosphere is very well created. It's a real page-turner!</div>
-                <span class="quote-mark close"></span>
+<!-- Work 2 -->
+<div class="work-item right">
+    <div class="work-card" style="transform:rotate(1.5deg);">
+        <div class="video-wrapper">
+            <iframe class="work-img youtube-iframe" src="https://www.youtube.com/embed/aCKnjn6tRGc?rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            <div class="custom-thumbnail" onclick="playVideo(this)">
+                <img src="stuff/2Pr.jpg" alt="Video thumbnail">
+                <div class="youtube-play-button"></div>
             </div>
         </div>
+        <div class="work-caption">Made a true crime video in a very short time.</div>
+    </div>
+    <div class="work-quote">
+        <span class="quote-mark open"></span>
+        <div class="quote-text">I like it.<br>The atmosphere is very well created. It's a real page-turner!</div>
+        <span class="quote-mark close"></span>
+    </div>
+</div>
 
-        <!-- Showreel -->
-        <div class="showreel-wrapper">
-            <div class="showreel-card">
-                <div class="showreel-img-container">
-                    <iframe src="https://www.youtube.com/embed/1RH4pFp9NIg?rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                </div>
-                <div class="work-caption" style="text-align:center;">My video editing showreel from 2024.</div>
+<!-- Showreel -->
+<div class="showreel-wrapper">
+    <div class="showreel-card">
+        <div class="showreel-img-container video-wrapper">
+            <iframe class="youtube-iframe" src="https://www.youtube.com/embed/1RH4pFp9NIg?rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            <div class="custom-thumbnail" onclick="playVideo(this)">
+                <img src="stuff/3Pr.jpg" alt="Video thumbnail">
+                <div class="youtube-play-button"></div>
             </div>
         </div>
+        <div class="work-caption" style="text-align:center;">My video editing showreel from 2024.</div>
+    </div>
+</div>
 
-        <!-- Work 3 -->
-        <div class="work-item left">
-            <div class="work-card" style="transform:rotate(-1deg);">
-                <iframe class="work-img" src="https://www.youtube.com/embed/gngJgZp3XCM?rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                <div class="work-caption">I and my friends made a IRL video about hotels.</div>
-            </div>
-            <div class="work-quote">
-                <span class="quote-mark open"></span>
-                <div class="quote-text">Cool editing</div>
-                <span class="quote-mark close"></span>
+<!-- Work 3 -->
+<div class="work-item left">
+    <div class="work-card" style="transform:rotate(-1deg);">
+        <div class="video-wrapper">
+            <iframe class="work-img youtube-iframe" src="https://www.youtube.com/embed/gngJgZp3XCM?rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            <div class="custom-thumbnail" onclick="playVideo(this)">
+                <img src="stuff/4Pr.jpg" alt="Video thumbnail">
+                <div class="youtube-play-button"></div>
             </div>
         </div>
+        <div class="work-caption">I and my friends made a IRL video about hotels.</div>
+    </div>
+    <div class="work-quote">
+        <span class="quote-mark open"></span>
+        <div class="quote-text">Cool editing</div>
+        <span class="quote-mark close"></span>
+    </div>
+</div>
 
-        <!-- Work 4 -->
-        <div class="work-item right">
-            <div class="work-card" style="transform:rotate(2deg);">
-                <iframe class="work-img" src="https://www.youtube.com/embed/rDtSHKJsqfM?rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                <div class="work-caption">A promo video for a productivity app.</div>
-            </div>
-            <div class="work-quote">
-                <span class="quote-mark open"></span>
-                <div class="quote-text">Awesome! Thank you so much! That’s really cool, it gives me goosebumps.</div>
-                <span class="quote-mark close"></span>
+<!-- Work 4 -->
+<div class="work-item right">
+    <div class="work-card" style="transform:rotate(2deg);">
+        <div class="video-wrapper">
+            <iframe class="work-img youtube-iframe" src="https://www.youtube.com/embed/rDtSHKJsqfM?rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            <div class="custom-thumbnail" onclick="playVideo(this)">
+                <img src="stuff/5Pr.png" alt="Video thumbnail">
+                <div class="youtube-play-button"></div>
             </div>
         </div>
+        <div class="work-caption">A promo video for a productivity app.</div>
+    </div>
+    <div class="work-quote">
+        <span class="quote-mark open"></span>
+        <div class="quote-text">Awesome! Thank you so much! That’s really cool, it gives me goosebumps.</div>
+        <span class="quote-mark close"></span>
+    </div>
+</div>
 
-        <!-- Video 5 (Poster/Short Film) -->
-        <div class="work-item left" style="justify-content:center;">
-            <div class="poster-card" style="transform:rotate(-1.5deg);flex:0 0 24%;">
-                <a href="https://youtu.be/aCKnjn6tRGc?si=cXwcDFOVEdWm40r2" target="_blank">
-                    <img src="stuff/6Pr.png" alt="Poster" class="poster-img" style="background:linear-gradient(180deg,#333 0%,#111 100%);">
-                </a>
-                <div class="poster-caption">
-                    Edited and was assistant cameraman in the short film <a href="https://www.imdb.com/title/tt36775570/" target="_blank">"Love in the Fitting Room"</a>.
-                    <br><br>
-                    Participates in festivals <a href="https://filmfreeway.com/First-TimeFilmmakerSessions" target="_blank">FTSFV (vimeo on demand),</a> <a href="https://www.instagram.com/p/DDXZVPnRdIw/" target="_blank">Pinewood Studios in London</a>
-                </div>
-            </div>
-            <div class="work-quote">
-                <span class="quote-mark open"></span>
-                <div class="quote-text">You're the best!<br>Everything is great,<br>be sure to come to the cinema to see what we've done. Wait for a surprise from me.</div>
-                <span class="quote-mark close"></span>
-            </div>
+<!-- Video 5 (Poster/Short Film) -->
+<div class="work-item left" style="justify-content:center;">
+    <div class="poster-card" style="transform:rotate(-1.5deg);flex:0 0 24%;">
+        <a href="https://youtu.be/aCKnjn6tRGc?si=cXwcDFOVEdWm40r2" target="_blank">
+            <img src="stuff/6Pr.png" alt="Poster" class="poster-img" style="background:linear-gradient(180deg,#333 0%,#111 100%);">
+        </a>
+        <div class="poster-caption">
+            Edited and was assistant cameraman in the short film <a href="https://www.imdb.com/title/tt36775570/" target="_blank">"Love in the Fitting Room"</a>.
+            <br><br>
+            Participates in festivals <a href="https://filmfreeway.com/First-TimeFilmmakerSessions" target="_blank">FTSFV (vimeo on demand),</a> <a href="https://www.instagram.com/p/DDXZVPnRdIw/" target="_blank">Pinewood Studios in London</a>
         </div>
+    </div>
+    <div class="work-quote">
+        <span class="quote-mark open"></span>
+        <div class="quote-text">You're the best!<br>Everything is great,<br>be sure to come to the cinema to see what we've done. Wait for a surprise from me.</div>
+        <span class="quote-mark close"></span>
+    </div>
+</div>
+
+<style>
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.work-img, .showreel-img-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.showreel-img-container {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%;
+}
+
+.custom-thumbnail {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    z-index: 10;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.custom-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.custom-thumbnail:hover img {
+    transform: scale(1.05);
+}
+
+/* YouTube стиль кнопки воспроизведения */
+.youtube-play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 68px;
+    height: 48px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 14px;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.youtube-play-button::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-40%, -50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 12px 0 12px 20px;
+    border-color: transparent transparent transparent #ffffff;
+}
+
+.custom-thumbnail:hover .youtube-play-button {
+    background-color: rgba(255, 0, 0, 0.9);
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .youtube-play-button {
+        width: 54px;
+        height: 38px;
+        border-radius: 11px;
+    }
+    
+    .youtube-play-button::after {
+        border-width: 10px 0 10px 16px;
+    }
+}
+</style>
+
+<script>
+function playVideo(thumbnail) {
+    const wrapper = thumbnail.parentElement;
+    const iframe = wrapper.querySelector('.youtube-iframe');
+    
+    if (iframe) {
+        const videoSrc = iframe.src;
+        // Добавляем autoplay и скрываем превью
+        iframe.src = videoSrc + (videoSrc.includes('?') ? '&' : '?') + 'autoplay=1';
+        thumbnail.style.display = 'none';
+    }
+}
+</script>
 
         <div class="terminal-decoration" style="position:absolute;bottom:15px;right:20px;color:rgba(255,255,255,0.1);">
 // export.complete()
